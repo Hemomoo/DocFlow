@@ -278,6 +278,19 @@ const Folder = ({ initialFiles = defaultFiles, onFileSelect }: FileExplorerProps
   );
 
   const collapseAll = useCallback(() => setExpandedFolders({}), []);
+  const openAll = useCallback(() => {
+    const newExpandedFolders = Object.keys(expandedFolders).reduce(
+      (acc, key) => {
+        acc[key] = true;
+
+        return acc;
+      },
+      {} as Record<string, boolean>,
+    );
+
+    setExpandedFolders(newExpandedFolders);
+  }, [expandedFolders]);
+
   const createNewRootItem = useCallback(
     (type: 'file' | 'folder') => startCreateNewItem('root', type),
     [startCreateNewItem],
@@ -412,12 +425,13 @@ const Folder = ({ initialFiles = defaultFiles, onFileSelect }: FileExplorerProps
               },
               { icon: 'RefreshCw', action: refreshFiles, tooltip: '刷新', color: 'green' },
               { icon: 'FolderMinus', action: collapseAll, tooltip: '折叠所有', color: 'slate' },
+              { icon: 'FolderOpenDot', action: openAll, tooltip: '打开所有', color: 'yellow' },
             ].map((item, index) => (
               <div key={item.icon} className="relative group">
                 <button
                   className={cn(
                     'p-2 rounded-xl transition-all duration-300 transform hover:scale-110 group/btn',
-                    'bg-white/80 dark:bg-slate-700/80 backdrop-blur-md',
+                    'bg-white/80 dark:bg-slate-700/80 backdrop-blur-md cursor-pointer',
                     'hover:shadow-lg border border-slate-200/50 dark:border-slate-600/50',
                     item.color === 'blue' &&
                       'hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 hover:text-blue-600 hover:border-blue-300/50',
