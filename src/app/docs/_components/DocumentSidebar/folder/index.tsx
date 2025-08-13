@@ -17,6 +17,22 @@ import { DocumentResponse } from '@/services/document/type';
 // 默认文件结构，可以根据需求修改
 const defaultFiles: FileItem[] = [];
 
+// 颜色主题样式映射
+const getColorThemeClasses = (color: string) => {
+  const colorThemes = {
+    blue: 'hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 hover:text-blue-600 hover:border-blue-300/50',
+    yellow:
+      'hover:bg-gradient-to-br hover:from-yellow-50 hover:to-amber-50 hover:text-amber-600 hover:border-amber-300/50',
+    green:
+      'hover:bg-gradient-to-br hover:from-green-50 hover:to-emerald-50 hover:text-green-600 hover:border-green-300/50',
+    pink: 'hover:bg-gradient-to-br hover:from-pink-50 hover:to-pink-100 hover:text-pink-700 hover:border-pink-300/50',
+    slate:
+      'hover:bg-gradient-to-br hover:from-slate-50 hover:to-slate-100 hover:text-slate-700 hover:border-slate-300/50',
+  };
+
+  return colorThemes[color as keyof typeof colorThemes] || '';
+};
+
 const Folder = ({ initialFiles = defaultFiles, onFileSelect }: FileExplorerProps) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -430,21 +446,15 @@ const Folder = ({ initialFiles = defaultFiles, onFileSelect }: FileExplorerProps
               <div key={item.icon} className="relative group">
                 <button
                   className={cn(
+                    // 基础样式
                     'p-2 rounded-xl transition-all duration-300 transform hover:scale-110 group/btn',
                     'bg-white/80 dark:bg-slate-700/80 backdrop-blur-md cursor-pointer',
                     'hover:shadow-lg border border-slate-200/50 dark:border-slate-600/50',
-                    item.color === 'blue' &&
-                      'hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 hover:text-blue-600 hover:border-blue-300/50',
-                    item.color === 'yellow' &&
-                      'hover:bg-gradient-to-br hover:from-yellow-50 hover:to-amber-50 hover:text-amber-600 hover:border-amber-300/50',
-                    item.color === 'green' &&
-                      'hover:bg-gradient-to-br hover:from-green-50 hover:to-emerald-50 hover:text-green-600 hover:border-green-300/50',
-                    item.color === 'pink' &&
-                      'hover:bg-gradient-to-br hover:from-pink-50 hover:to-pink-100 hover:text-pink-700 hover:border-pink-300/50',
-                    item.color === 'slate' &&
-                      'hover:bg-gradient-to-br hover:from-slate-50 hover:to-slate-100 hover:text-slate-700 hover:border-slate-300/50',
-                    'dark:hover:from-slate-600/80 dark:hover:to-slate-700/80 dark:hover:text-slate-200',
                     'text-slate-600 dark:text-slate-400',
+                    // 颜色主题样式
+                    getColorThemeClasses(item.color),
+                    // 深色模式覆盖
+                    'dark:hover:from-slate-600/80 dark:hover:to-slate-700/80 dark:hover:text-slate-200',
                   )}
                   onClick={item.action}
                   style={{ animationDelay: `${index * 100}ms` }}
