@@ -425,7 +425,7 @@ const Folder = ({ initialFiles = defaultFiles, onFileSelect }: FileExplorerProps
               },
               { icon: 'RefreshCw', action: refreshFiles, tooltip: '刷新', color: 'green' },
               { icon: 'FolderMinus', action: collapseAll, tooltip: '折叠所有', color: 'slate' },
-              { icon: 'FolderOpenDot', action: openAll, tooltip: '打开所有', color: 'yellow' },
+              { icon: 'FolderOpenDot', action: openAll, tooltip: '打开所有', color: 'pink' },
             ].map((item, index) => (
               <div key={item.icon} className="relative group">
                 <button
@@ -439,6 +439,8 @@ const Folder = ({ initialFiles = defaultFiles, onFileSelect }: FileExplorerProps
                       'hover:bg-gradient-to-br hover:from-yellow-50 hover:to-amber-50 hover:text-amber-600 hover:border-amber-300/50',
                     item.color === 'green' &&
                       'hover:bg-gradient-to-br hover:from-green-50 hover:to-emerald-50 hover:text-green-600 hover:border-green-300/50',
+                    item.color === 'pink' &&
+                      'hover:bg-gradient-to-br hover:from-pink-50 hover:to-pink-100 hover:text-pink-700 hover:border-pink-300/50',
                     item.color === 'slate' &&
                       'hover:bg-gradient-to-br hover:from-slate-50 hover:to-slate-100 hover:text-slate-700 hover:border-slate-300/50',
                     'dark:hover:from-slate-600/80 dark:hover:to-slate-700/80 dark:hover:text-slate-200',
