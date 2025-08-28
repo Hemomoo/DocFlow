@@ -8,12 +8,7 @@ import { Collaboration } from '@tiptap/extension-collaboration';
 import { CollaborationCaret } from '@tiptap/extension-collaboration-caret';
 import { IndexeddbPersistence } from 'y-indexeddb';
 import { HocuspocusProvider } from '@hocuspocus/provider';
-// import { isEqual, debounce } from 'lodash-es';
-// import { Menu } from 'lucide-react';
 
-// import Syllabus, { SyllabusTitle } from '../_components/Syllabus';
-
-// import { Button } from '@/components/ui/button';
 import { ExtensionKit } from '@/extensions/extension-kit';
 import { getCursorColorByUserId } from '@/utils/cursor_color';
 import { getAuthToken } from '@/utils/cookie';
