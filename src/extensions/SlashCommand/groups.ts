@@ -319,6 +319,16 @@ export const GROUPS: Group[] = [
           editor.chain().focus().setCountdown({ targetDate: '' }).run();
         },
       },
+      {
+        name: 'reactFlow',
+        label: 'React Flow',
+        iconName: 'Flower',
+        description: 'Insert a React Flow diagram',
+        aliases: ['reactflow'],
+        action: (editor) => {
+          editor.chain().focus().setReactFlow({}).run();
+        },
+      },
     ],
   },
 ];

@@ -62,6 +62,7 @@ import {
   Bilibili,
   Chart,
   Countdown,
+  ReactFlow,
 } from '.';
 import { ImageUpload } from './ImageUpload';
 import { TableOfContentsNode } from './TableOfContentsNode';
@@ -396,6 +397,7 @@ export const ExtensionKit = ({ provider }: ExtensionKitProps) => [
   Bilibili,
   Chart,
   Countdown,
+  ReactFlow,
 ];
 
 export default ExtensionKit;
