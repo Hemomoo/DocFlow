@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
-import { CalendarIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { FileItem } from './type';
@@ -105,13 +105,10 @@ const ShareDialog = ({ file, isOpen, onClose }: ShareDialogProps) => {
   }, [showCalendar]);
 
   // 处理用户选择变化
-  const handleUserSelectionChange = useCallback(
-    (users: User[]) => {
-      setSelectedUsers(users);
-      setValue('selectedUsers', users);
-    },
-    [setValue],
-  );
+  const handleUserSelectionChange = (users: User[]) => {
+    setSelectedUsers(users);
+    setValue('selectedUsers', users);
+  };
 
   const onSubmit = async (data: ShareFormData) => {
     setIsLoading(true);
@@ -127,7 +124,7 @@ const ShareDialog = ({ file, isOpen, onClose }: ShareDialogProps) => {
 
       const response = await DocumentApi.CreateShareLink(parseInt(file.id), shareData);
 
-      if (response?.data?.code === 201 && response?.data?.data) {
+      if (response?.data?.code === 200 && response?.data?.data) {
         // 根据实际返回的数据结构构建分享链接
         const shareId = response.data.data.id;
         let shareUrl = `${window.location.origin}/share/${shareId}`;
@@ -281,11 +278,7 @@ const ShareDialog = ({ file, isOpen, onClose }: ShareDialogProps) => {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
-                      {showPassword ? (
-                        <EyeOffIcon className="h-4 w-4" />
-                      ) : (
-                        <EyeIcon className="h-4 w-4" />
-                      )}
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                   {errors.password && (
@@ -316,7 +309,7 @@ const ShareDialog = ({ file, isOpen, onClose }: ShareDialogProps) => {
                           mode="single"
                           selected={watchedValues.expiresAt}
                           onSelect={handleDateSelect}
-                          disabled={(date) => date < new Date()}
+                          disabled={(date: Date) => date < new Date()}
                           initialFocus
                         />
                         <div className="p-3 border-t border-gray-200">

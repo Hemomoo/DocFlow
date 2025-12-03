@@ -1,6 +1,11 @@
-import { Editor } from '@tiptap/react';
+import { useState } from 'react';
+import { MessageSquare, FileText } from 'lucide-react';
+
+import ShareDialog from '../DocumentSidebar/folder/ShareDialog';
+import { FileItem } from '../DocumentSidebar/folder/type';
 
 import { Icon } from '@/components/ui/Icon';
+import { useCommentStore } from '@/stores/commentStore';
 
 // 类型定义
 interface CollaborationUser {
@@ -8,19 +13,6 @@ interface CollaborationUser {
   name: string;
   color: string;
   avatar: string;
-}
-
-// 编辑器信息组件
-function EditorInfo({ editor }: { editor: Editor }) {
-  const characters = editor.storage.characterCount?.characters() || 0;
-  const words = editor.storage.characterCount?.words() || 0;
-
-  return (
-    <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-      <span>{characters} 字符</span>
-      <span>{words} 词</span>
-    </div>
-  );
 }
 
 // 协作用户头像组件
@@ -93,29 +85,22 @@ function UserAvatar({
 }
 
 interface DocumentHeaderProps {
-  editor?: Editor | null;
-  isSidebarOpen?: boolean;
-  toggleSidebar?: () => void;
-  isTocOpen?: boolean;
-  toggleToc?: () => void;
   provider?: any;
   connectedUsers?: CollaborationUser[];
   currentUser?: CollaborationUser | null;
-  connectionStatus?: string;
-  isOffline?: boolean;
+  // 分享相关属性
+  documentId?: string;
+  documentName?: string;
+  documentTitle?: string; // 添加实际的文档标题字段
 }
 
 export default function DocumentHeader({
-  editor,
-  isSidebarOpen,
-  toggleSidebar,
-  isTocOpen,
-  toggleToc,
   provider,
   connectedUsers = [],
   currentUser,
-  connectionStatus,
-  isOffline = false,
+  documentId,
+  documentName = '未命名文档',
+  documentTitle,
 }: DocumentHeaderProps) {
   // 判断是否为协作模式
   const isCollaborationMode = provider && Array.isArray(connectedUsers);
@@ -126,187 +111,146 @@ export default function DocumentHeader({
     ...(currentUser && !connectedUsers.find((u) => u.id === currentUser.id) ? [currentUser] : []),
   ];
 
-  // 获取连接状态显示文本
-  const getConnectionStatusText = () => {
-    if (isOffline) return '离线模式';
-    if (!provider) return '';
+  // 分享对话框状态
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareDialogFile, setShareDialogFile] = useState<FileItem | null>(null);
 
-    switch (connectionStatus) {
-      case 'connected':
-        return '协作中';
-      case 'connecting':
-        return '连接中...';
-      case 'syncing':
-        return '同步中...';
-      case 'disconnected':
-        return '已断开';
-      case 'error':
-        return '连接失败';
-      default:
-        return '未连接';
-    }
-  };
+  // 评论面板状态
+  const { isPanelOpen, togglePanel, comments } = useCommentStore();
 
-  // 获取连接状态颜色
-  const getConnectionStatusColor = () => {
-    if (isOffline) return 'text-yellow-600 dark:text-yellow-400';
-    if (!provider) return '';
+  // 获取实际显示的标题 - 优先使用documentTitle（真实文档名），其次是documentName，最后是默认值
+  const displayTitle = documentTitle || documentName || '未命名文档';
 
-    switch (connectionStatus) {
-      case 'connected':
-        return 'text-green-600 dark:text-green-400';
-      case 'connecting':
-      case 'syncing':
-        return 'text-blue-600 dark:text-blue-400';
-      case 'disconnected':
-        return 'text-yellow-600 dark:text-yellow-400';
-      case 'error':
-        return 'text-red-600 dark:text-red-400';
-      default:
-        return 'text-gray-500 dark:text-gray-400';
+  // 处理分享按钮点击
+  const handleShare = () => {
+    if (documentId) {
+      const fileItem: FileItem = {
+        id: documentId,
+        name: displayTitle, // 使用实际标题而不是documentName
+        type: 'file',
+        depth: 0,
+      };
+      setShareDialogFile(fileItem);
+      setShareDialogOpen(true);
     }
   };
 
   return (
-    <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700 min-h-[60px] relative !z-100000">
-      {/* 左侧：侧边栏切换按钮、目录按钮和文档标题 */}
+    <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700 min-h-[60px] relative z-10">
+      {/* 左侧：文档标题 */}
       <div className="flex items-center space-x-3 min-w-0 flex-1">
-        <div className="flex items-center space-x-1">
-          <button
-            type="button"
-            onClick={toggleSidebar}
-            className="flex-shrink-0 p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800"
-            aria-label={isSidebarOpen ? '隐藏侧边栏' : '显示侧边栏'}
-          >
-            <Icon name={isSidebarOpen ? 'PanelLeftClose' : 'PanelLeft'} />
-          </button>
-
-          {/* 目录控制按钮 */}
-          {toggleToc && (
-            <button
-              type="button"
-              onClick={toggleToc}
-              className={`
-                flex-shrink-0 p-2 rounded-lg transition-all duration-300 hover:scale-105
-                ${
-                  isTocOpen
-                    ? 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100 dark:text-indigo-400 dark:bg-indigo-950/30 dark:hover:bg-indigo-950/50 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'
-                }
-              `}
-              aria-label={isTocOpen ? '隐藏目录' : '显示目录'}
-            >
-              <div className="relative">
-                <Icon name="List" className="w-4 h-4" />
-                {isTocOpen && (
-                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full animate-pulse" />
-                )}
-              </div>
-            </button>
-          )}
-        </div>
-
         {/* 文档标题 */}
-        <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
-          {isCollaborationMode ? '协作文档' : '文档编辑器'}
-        </h1>
-
-        {/* 协作状态指示器 */}
-        {isCollaborationMode && (
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            <div
-              className={`w-2 h-2 rounded-full ${
-                connectionStatus === 'connected'
-                  ? 'bg-green-500'
-                  : connectionStatus === 'error'
-                    ? 'bg-red-500'
-                    : 'bg-yellow-500'
-              }`}
-            />
-            <span className={`text-sm font-medium ${getConnectionStatusColor()} hidden sm:inline`}>
-              {getConnectionStatusText()}
-            </span>
-          </div>
-        )}
+        <div className="flex items-center space-x-2 min-w-0">
+          <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+            {displayTitle || (isCollaborationMode ? '协作文档' : '文档编辑器')}
+          </h1>
+        </div>
       </div>
 
-      {/* 右侧：协作用户列表和编辑器信息 */}
-      <div className="flex items-center space-x-4 flex-shrink-0">
+      {/* 右侧：协作用户列表和操作按钮 */}
+      <div className="flex items-center space-x-3 flex-shrink-0">
         {/* 统一的协作用户显示 */}
         {isCollaborationMode && allUsers.length > 0 && (
-          <div className="flex items-center space-x-3">
-            {/* 桌面端显示完整信息 */}
-            <div className="hidden lg:flex items-center space-x-2">
-              <svg
-                className="w-4 h-4 text-green-500 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-                />
-              </svg>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">在线协作</span>
-            </div>
-
-            {/* 用户头像列表 */}
-            <div className="flex items-center -space-x-1">
-              {allUsers.slice(0, 5).map((user, index) => (
-                <UserAvatar
-                  key={user.id}
-                  user={user}
-                  currentUser={currentUser}
-                  index={index}
-                  total={allUsers.length}
-                />
-              ))}
-
-              {/* 更多用户计数 */}
-              {allUsers.length > 5 && (
-                <div className="w-8 h-8 bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-full flex items-center justify-center text-xs font-semibold text-gray-600 dark:text-gray-300 shadow-sm ml-1">
-                  +{allUsers.length - 5}
-                </div>
-              )}
-            </div>
-
-            {/* 用户数量文字说明 */}
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              {allUsers.length === 1 ? (
-                currentUser && allUsers[0].id === currentUser.id ? (
-                  <span className="text-blue-600 dark:text-blue-400 hidden sm:inline">
-                    只有您在线
-                  </span>
-                ) : (
-                  <span className="hidden sm:inline">1位用户在线</span>
-                )
-              ) : (
-                <span className="text-green-600 dark:text-green-400">
-                  <span className="hidden sm:inline">{allUsers.length}位用户在线</span>
-                  <span className="sm:hidden">{allUsers.length}人</span>
+          <>
+            <div className="flex items-center space-x-3 px-3 py-1.5 bg-green-50/80 dark:bg-green-950/30 rounded-lg border border-green-200/50 dark:border-green-800/50">
+              {/* 桌面端显示完整信息 */}
+              <div className="hidden lg:flex items-center">
+                <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                  在线协作
                 </span>
-              )}
+              </div>
+
+              {/* 用户头像列表 */}
+              <div className="flex items-center -space-x-1">
+                {allUsers.slice(0, 5).map((user, index) => (
+                  <UserAvatar
+                    key={user.id}
+                    user={user}
+                    currentUser={currentUser}
+                    index={index}
+                    total={allUsers.length}
+                  />
+                ))}
+
+                {/* 更多用户计数 */}
+                {allUsers.length > 5 && (
+                  <div className="w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 border-2 border-white dark:border-gray-600 rounded-full flex items-center justify-center text-xs font-semibold text-gray-600 dark:text-gray-300 shadow-sm ml-1 hover:scale-105 transition-transform duration-200">
+                    +{allUsers.length - 5}
+                  </div>
+                )}
+              </div>
+
+              {/* 用户数量文字说明 */}
+              <div className="text-sm font-medium text-green-600 dark:text-green-400">
+                <span className="hidden sm:inline">{allUsers.length}位用户在线</span>
+                <span className="sm:hidden">{allUsers.length}人</span>
+              </div>
             </div>
-          </div>
+
+            {/* 分隔线 */}
+            <div className="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
+          </>
         )}
 
-        {/* 编辑器信息 */}
-        {editor && (
-          <div className="hidden lg:flex items-center space-x-4">
-            <EditorInfo editor={editor} />
-          </div>
+        {/* 评论按钮 */}
+        <button
+          type="button"
+          onClick={togglePanel}
+          className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 border ${
+            isPanelOpen
+              ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800'
+              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700'
+          }`}
+          aria-label="评论"
+        >
+          <MessageSquare className="w-4 h-4" />
+          <span className="hidden sm:inline text-sm font-medium">评论</span>
+          {comments.length > 0 && (
+            <span className="px-1.5 py-0.5 text-xs font-semibold rounded-full bg-blue-500 text-white min-w-[20px] text-center">
+              {comments.length}
+            </span>
+          )}
+        </button>
+
+        {/* 分享按钮 */}
+        {documentId && (
+          <button
+            type="button"
+            onClick={handleShare}
+            className="flex items-center space-x-2 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-200 border border-gray-200 dark:border-gray-700"
+            aria-label="分享文档"
+          >
+            <Icon name="Share" className="w-4 h-4" />
+            <span className="hidden sm:inline text-sm font-medium">分享</span>
+          </button>
         )}
 
-        {/* 非协作模式的简单状态 */}
-        {!isCollaborationMode && provider && (
-          <div className="text-sm text-gray-500 dark:text-gray-400 hidden sm:block">
-            协作状态: {provider.connected ? '已连接' : '未连接'}
-          </div>
-        )}
+        {/* GitHub 链接 */}
+        <a
+          href="https://github.com/xun082/DocFlow"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-200 border border-gray-200 dark:border-gray-700"
+          aria-label="查看 GitHub 仓库"
+        >
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.30.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+          </svg>
+        </a>
       </div>
+
+      {/* 分享对话框 */}
+      {shareDialogFile && (
+        <ShareDialog
+          file={shareDialogFile}
+          isOpen={shareDialogOpen}
+          onClose={() => {
+            setShareDialogOpen(false);
+            setShareDialogFile(null);
+          }}
+        />
+      )}
     </div>
   );
 }

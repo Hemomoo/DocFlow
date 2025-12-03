@@ -1,6 +1,6 @@
 import { JSONContent } from '@tiptap/core';
 
-interface DocumentItem {
+export interface DocumentItem {
   id: number;
   title: string;
   type: 'FILE' | 'FOLDER';
@@ -47,19 +47,29 @@ export interface SharedDocumentItem extends DocumentItem {
   shareInfo: ShareInfo;
 }
 
-// 返回结构类型
+// 获取文档列表响应
+export interface GetDocumentsResponse {
+  documents: DocumentItem[];
+  total: number;
+}
+
+// 返回结构类型（保留用于其他 API）
 export interface DocumentResponse {
   owned: DocumentItem[];
   shared: DocumentItem[];
 }
 
-// 通过分享链接访问的文档响应
-export interface SharedDocumentsResponse {
-  data: SharedDocumentItem[];
-  code: number;
-  message: string;
-  timestamp: number;
+export interface LatestDocumentItem extends DocumentItem {
+  author: string;
 }
+
+// 通过分享链接访问的文档响应
+// export interface SharedDocumentsResponse {
+//   data: SharedDocumentItem[];
+//   code: number;
+//   message: string;
+//   timestamp: number;
+// }
 
 export interface CreateDocumentDto {
   title: string;
@@ -146,6 +156,17 @@ export interface AccessSharedDocumentResponse {
   };
 }
 
+export interface DocumentPermissionData {
+  documentId: number;
+  userId: number;
+  username: string;
+  avatar: string;
+  documentTitle: string;
+  documentType: 'FILE' | 'FOLDER';
+  isOwner: boolean;
+  permission: 'NONE' | 'VIEW' | 'EDIT' | 'COMMENT' | 'MANAGE' | 'FULL';
+}
+
 export interface GetDocumentPermissionResponse {
   documentId: number;
   userId: number;
@@ -156,7 +177,7 @@ export interface GetDocumentPermissionResponse {
 }
 
 // 获取文档内容的响应类型
-export interface GetDocumentContentResponse {
+export interface DocumentPermissionsResponse {
   code: number;
   message: string;
   data: {
@@ -168,4 +189,10 @@ export interface GetDocumentContentResponse {
     updated_at: string;
   };
   timestamp: number;
+}
+
+// 移动文档的请求类型
+export interface MoveDocumentsDto {
+  document_ids: number[];
+  target_folder_id: number;
 }

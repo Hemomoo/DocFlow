@@ -1,26 +1,31 @@
+import { JSONContent } from '@tiptap/core';
+
 import request, { ErrorHandler } from '../request';
 import {
   CreateDocumentDto,
   DocumentResponse,
+  GetDocumentsResponse,
   CreateShareLinkDto,
   ShareLinkResponse,
   DeleteDocumentDto,
   RenameDocumentDto,
   DuplicateDocumentDto,
-  SharedDocumentsResponse,
+  // SharedDocumentsResponse,
   AccessSharedDocumentDto,
   AccessSharedDocumentResponse,
-  GetDocumentContentResponse,
+  SharedDocumentItem,
+  DocumentPermissionData,
+  LatestDocumentItem,
 } from './type';
 
 export const DocumentApi = {
   // 获取文档列表
   GetDocument: (errorHandler?: ErrorHandler) =>
-    request.get<DocumentResponse>('/api/v1/documents', { errorHandler }),
+    request.get<GetDocumentsResponse>('/api/v1/documents', { errorHandler, cacheTime: 0 }),
 
-  // 获取文档内容
-  GetDocumentContent: (documentId: number, errorHandler?: ErrorHandler) =>
-    request.get<GetDocumentContentResponse>(`/api/v1/documents/${documentId}/content`, {
+  // 获取文档权限
+  GetDocumentPermissions: (documentId: number, errorHandler?: ErrorHandler) =>
+    request.get<DocumentPermissionData>(`/api/v1/documents/${documentId}/permissions`, {
       errorHandler,
     }),
 
@@ -63,9 +68,13 @@ export const DocumentApi = {
       },
     }),
 
-  GetDocumentPermission: (id: string, errorHandler?: ErrorHandler) =>
-    request.get<DocumentResponse>(`/api/v1/documents/${id}/user-permissions`, {
+  // 保存文档内容
+  SaveDocumentContent: (documentId: number, content: JSONContent, errorHandler?: ErrorHandler) =>
+    request.put<{ success: boolean }>(`/api/v1/documents/${documentId}/content`, {
       errorHandler,
+      params: {
+        content,
+      },
     }),
 
   // 复制文档
@@ -86,7 +95,7 @@ export const DocumentApi = {
 
   // 获取通过分享链接访问过的文档
   GetSharedDocuments: (errorHandler?: ErrorHandler) =>
-    request.get<SharedDocumentsResponse>('/api/v1/documents/shared-via-link', { errorHandler }),
+    request.get<SharedDocumentItem[]>('/api/v1/documents/shared-via-link', { errorHandler }),
 
   // 通过分享链接访问文档
   AccessSharedDocument: (data: AccessSharedDocumentDto, errorHandler?: ErrorHandler) =>
@@ -96,6 +105,23 @@ export const DocumentApi = {
         password: data.password,
       },
     }),
+
+  // 移动文档
+  MoveDocuments: (
+    data: { document_ids: number[]; target_folder_id: number },
+    errorHandler?: ErrorHandler,
+  ) =>
+    request.put<{ success: boolean }>('/api/v1/documents/move', {
+      errorHandler,
+      params: {
+        document_ids: data.document_ids,
+        target_folder_id: data.target_folder_id,
+      },
+    }),
+
+  // 查询最新的文档
+  GetLatestDocuments: (limit: number, errorHandler?: ErrorHandler) =>
+    request.get<LatestDocumentItem[]>(`/api/v1/documents/latest/${limit}`, { errorHandler }),
 };
 
 export default DocumentApi;

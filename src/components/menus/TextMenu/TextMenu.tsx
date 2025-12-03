@@ -61,7 +61,7 @@ export const TextMenu = ({ editor }: TextMenuProps) => {
       className={selecting ? 'hidden' : ''}
       options={{
         placement: 'top-start',
-        offset: 8,
+        offset: 60,
         shift: {
           padding: 8,
         },
@@ -122,6 +122,14 @@ export const TextMenu = ({ editor }: TextMenuProps) => {
         </MemoButton>
         <MemoButton tooltip="Code block" onClick={commands.onCodeBlock}>
           <Icon name="FileCode" />
+        </MemoButton>
+        <MemoButton
+          tooltip="添加评论"
+          tooltipShortcut={['Mod', 'Shift', 'M']}
+          onClick={commands.onComment}
+          active={states.isComment}
+        >
+          <Icon name="MessageCircle" />
         </MemoButton>
         <EditLinkPopover onSetLink={commands.onLink} />
         <Popover.Root>
