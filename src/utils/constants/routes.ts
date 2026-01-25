@@ -17,6 +17,7 @@ export const ROUTES = {
   CONTACTS: '/dashboard/contacts',
   ORGANIZATIONS: '/dashboard/organizations',
   BLOG: '/dashboard/blogs',
+  VIDEO_CALL: '/dashboard/videoCall',
 } as const;
 
 // 页面标题映射
@@ -32,6 +33,7 @@ export const PAGE_TITLE_MAP: Record<string, string> = {
   [ROUTES.PODCAST]: '播客管理',
   [ROUTES.DOCS]: '文档管理',
   [ROUTES.BLOG]: '博客管理',
+  [ROUTES.VIDEO_CALL]: '视频通话',
 };
 
 // 页面描述映射

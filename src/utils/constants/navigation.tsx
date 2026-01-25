@@ -10,6 +10,7 @@ import {
   Workflow,
   Users,
   Building2,
+  Video,
 } from 'lucide-react';
 
 // Import route constants from routes.ts (Edge runtime compatible)
@@ -74,6 +75,12 @@ export const NAV_ITEMS: NavItem[] = [
     href: ROUTES.USER,
     icon: <User className="w-5 h-5" />,
     tourContent: '个人资料页面用于设置个人信息、账号与偏好。',
+  },
+  {
+    name: '视频通话',
+    href: ROUTES.VIDEO_CALL,
+    icon: <Video className="w-5 h-5" />,
+    tourContent: '视频通话模块用于进行实时视频会议和在线协作沟通。',
   },
   {
     name: '播客',

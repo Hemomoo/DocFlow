@@ -561,6 +561,7 @@ class ClientRequest {
     } = props;
 
     const fullUrl = this.baseURL + url;
+    console.log('fullUrl', fullUrl);
 
     addSentryBreadcrumb({
       category: 'http',
