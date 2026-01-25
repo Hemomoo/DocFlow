@@ -1,4 +1,4 @@
-import { clientRequest, ClientRequest } from '../request';
+import { clientRequest } from '../request';
 import { QuickCreateRoomDto, LiveKitConnectionDetailsDto } from './type';
 
 export class LivekitService {
