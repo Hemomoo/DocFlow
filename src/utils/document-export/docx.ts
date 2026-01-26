@@ -21,7 +21,6 @@ export async function handleExportDOCX(name: string, editor: Editor): Promise<vo
     }
 
     const json = editor.getJSON();
-    console.log('🚀 ~ Exporting DOCX ~ json:', json);
 
     if (!json?.content?.length) {
       toast.warning('文档内容为空');

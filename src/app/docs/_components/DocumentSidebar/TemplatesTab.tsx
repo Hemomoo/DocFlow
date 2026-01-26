@@ -58,7 +58,6 @@ const TemplatesTab = () => {
     const tiptapContent = await templateToTiptapJSONWithEditor({
       content: selectedTemplate.content || '',
     });
-    console.log('🚀 ~ handleConfirmCreateFromTemplate ~ tiptapContent:', tiptapContent);
 
     const document = await DocumentApi.CreateDocument({
       title: fileName,

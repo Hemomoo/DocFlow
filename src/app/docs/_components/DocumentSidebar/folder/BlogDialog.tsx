@@ -169,7 +169,6 @@ export function BlogDialog({ isOpen, onClose, onSubmit, initialTitle = '' }: Blo
 
   // 表单提交
   const handleSubmit = (data: FormValues) => {
-    console.log('🚀 ~ file: BlogDialog.tsx:167 ~ data:', data);
     onSubmit(data);
     onClose();
     // 重置表单

@@ -63,7 +63,6 @@ export async function templateToTiptapJSONWithEditor(
       onCreate: ({ editor }) => {
         try {
           const nodes = parseMarkdownToProseMirror(content, editor);
-          console.log('🚀 ~ templateToTiptapJSONWithEditor ~ nodes:', nodes);
 
           if (nodes.length > 0) {
             editor.commands.setContent({
