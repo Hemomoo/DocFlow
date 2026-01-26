@@ -1,1 +1,1 @@
-export { MarkdownPaste } from './MarkdownPaste';
+export { MarkdownPaste, parseMarkdownToProseMirror } from './MarkdownPaste';

@@ -2,7 +2,7 @@ import { Editor } from '@tiptap/core';
 import { JSONContent } from '@tiptap/core';
 
 import { ExtensionKit } from '@/extensions/extension-kit';
-import { MarkdownPaste } from '@/extensions/MarkdownPaste';
+import { MarkdownPaste, parseMarkdownToProseMirror } from '@/extensions/MarkdownPaste';
 
 export interface TemplateToTiptapOptions {
   content: string;
@@ -47,10 +47,8 @@ export async function templateToTiptapJSONWithEditor(
   }
 
   return new Promise((resolve) => {
-    let editorInstance: Editor | null = null;
-
-    editorInstance = new Editor({
-      content: content,
+    new Editor({
+      content: '',
       extensions: [
         ...ExtensionKit({ provider: null }),
         MarkdownPaste.configure({
@@ -63,24 +61,31 @@ export async function templateToTiptapJSONWithEditor(
         },
       },
       onCreate: ({ editor }) => {
-        editorInstance = editor;
-      },
-      onSelectionUpdate: ({ editor }) => {
-        if (editorInstance) {
+        try {
+          const nodes = parseMarkdownToProseMirror(content, editor);
+          console.log('🚀 ~ templateToTiptapJSONWithEditor ~ nodes:', nodes);
+
+          if (nodes.length > 0) {
+            editor.commands.setContent({
+              type: 'doc',
+              content: nodes.map((node) => node.toJSON()),
+            });
+          } else {
+            editor.commands.setContent(content);
+          }
+
           const json = editor.getJSON();
-          editorInstance.destroy();
+          editor.destroy();
+          resolve(json);
+        } catch (error) {
+          console.error('Error parsing markdown:', error);
+          editor.commands.setContent(content);
+
+          const json = editor.getJSON();
+          editor.destroy();
           resolve(json);
         }
       },
     });
-
-    // 超时处理，确保即使没有触发 onSelectionUpdate 也能解析
-    setTimeout(() => {
-      if (editorInstance) {
-        const json = editorInstance.getJSON();
-        editorInstance.destroy();
-        resolve(json);
-      }
-    }, 500);
   });
 }

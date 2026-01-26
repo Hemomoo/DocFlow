@@ -152,7 +152,7 @@ function isMarkdownContent(text: string): boolean {
   return text.split('\n').some((line) => patterns.some((p) => p.test(line.trim())));
 }
 
-function parseMarkdownToProseMirror(md: string, editor: Editor): ProseMirrorNode[] {
+export function parseMarkdownToProseMirror(md: string, editor: Editor): ProseMirrorNode[] {
   const tree = fromMarkdown(md, {
     extensions: [gfm()],
     mdastExtensions: [gfmFromMarkdown()],

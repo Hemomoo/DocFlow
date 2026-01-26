@@ -58,6 +58,7 @@ const TemplatesTab = () => {
     const tiptapContent = await templateToTiptapJSONWithEditor({
       content: selectedTemplate.content || '',
     });
+    console.log('🚀 ~ handleConfirmCreateFromTemplate ~ tiptapContent:', tiptapContent);
 
     const document = await DocumentApi.CreateDocument({
       title: fileName,
@@ -180,6 +181,14 @@ const TemplatesTab = () => {
                               handleCreateDocument(template);
                             }}
                           />
+                          {/* 增加一个查看详情的按钮 */}
+                          {/* <Info
+                            className="h-4 w-4 text-gray-400 dark:text-gray-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleShowTemplateDetails(template);
+                            }}
+                          /> */}
                         </div>
                       </div>
 
@@ -187,7 +196,7 @@ const TemplatesTab = () => {
                         {template.description}
                       </p>
                       <div className="flex flex-wrap gap-1 mt-2">
-                        {template.tags.map((tag) => (
+                        {template?.tags.map((tag) => (
                           <span
                             key={tag}
                             className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
