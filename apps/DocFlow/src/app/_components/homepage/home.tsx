@@ -25,6 +25,25 @@ import {
   Mail,
 } from 'lucide-react';
 
+// ─── Hooks ───────────────────────────────────────────────────────────────────
+function useActiveHash() {
+  const [hash, setHash] = useState('');
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setHash(window.location.hash);
+    };
+
+    handleHashChange();
+
+    window.addEventListener('hashchange', handleHashChange);
+
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  return hash;
+}
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const SITE = {
@@ -405,19 +424,7 @@ function HeroMockup() {
 
 function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const [activeHash, setActiveHash] = useState('');
-
-  useEffect(() => {
-    const handleHashChange = () => {
-      setActiveHash(window.location.hash);
-    };
-
-    handleHashChange();
-
-    window.addEventListener('hashchange', handleHashChange);
-
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+  const activeHash = useActiveHash();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-100">
